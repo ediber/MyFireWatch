@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1035187680991",
+    "project_id": "delta-essence-303010",
+    "storage_bucket": "delta-essence-303010.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1035187680991:android:e45f301e81e41085a95b6a",
+        "android_client_info": {
+          "package_name": "com.e.myfirewatch"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1035187680991-qli79qrofj2dch5up68kd4qr5k0vk9h5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyANFvSdONY5DHxp9gJx0QGrjo0dG-q9-FQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1035187680991-qli79qrofj2dch5up68kd4qr5k0vk9h5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
