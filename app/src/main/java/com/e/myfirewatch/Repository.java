@@ -18,22 +18,28 @@ import java.util.List;
 import java.util.Map;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 
 public class Repository {
 
-    private static final String TAG = "repository_tag";
+    private static final String TAG = "my_tag";
     // static variable single_instance of type Singleton
     private static Repository single_instance = null;
     private FirebaseFirestore db;
 
-    private List<Fire> localFires;
+    private MutableLiveData<List<Fire>> localFiresLive;
 
+    public LiveData<List<Fire>> getLocalFiresLive() {
+        return localFiresLive;
+    }
 
     private Repository() {
         // Access a Cloud Firestore instance from your Activity
         db = FirebaseFirestore.getInstance();
 
-        localFires = new ArrayList<>();
+        localFiresLive = new MutableLiveData<>();
+        localFiresLive.postValue(new ArrayList<>());
 
         listenToData();
     }
@@ -45,19 +51,35 @@ public class Repository {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
+
+                            List<Fire> localFires = localFiresLive.getValue();
                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                Log.d(TAG, document.getId() + " => " + document.getData());
+                        //        Log.d(TAG, document.getId() + " => " + document.getData());
                                 Map<String, Object> data = document.getData();
-                             //   data.get("reporter");
                                 int severity = Integer.parseInt(data.get("severity").toString());
                                 double lat = Double.parseDouble(data.get("lat").toString());
                                 double lng = Double.parseDouble(data.get("lng").toString());
                                 LatLng latlng = new LatLng(lat, lng);
-                                Fire fire = new Fire(data.get("reporter").toString(), severity,latlng);
+                                String activeString = data.get("is_active").toString();
+                                boolean isActive;
+                                if(activeString.equals("true")){
+                                    isActive = true;
+                                } else {
+                                    isActive = false;
+                                }
+
+                                Fire fire = new Fire(data.get("reporter").toString(), severity,latlng,
+                                        document.getId(), isActive);
+
                                 localFires.add(fire);
                             }
+
+                            localFiresLive.setValue(localFires);
+
+                            Log.d(TAG, "post value: " + task.getResult().size());
+
                         } else {
-                            Log.w(TAG, "Error getting documents.", task.getException());
+                            Log.d(TAG, "Error getting documents.", task.getException());
                         }
                     }
                 });
@@ -74,30 +96,64 @@ public class Repository {
     }
 
 
-    public void save(double latitude, double longitude, String severity, String reporter) {
+    public void save(double latitude, double longitude, String severity, String reporter, boolean active, String id) {
 
         Map<String, Object> fire = new HashMap<>();
         fire.put("lat", latitude);
         fire.put("lng", longitude);
         fire.put("reporter", reporter);
         fire.put("severity", severity);
+        fire.put("is_active", active);
 
-// Add a new document with a generated ID
-        db.collection("fires")
-                .add(fire)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG, "Error adding document", e);
-                    }
-                });
+        // we add a new fire to firebase
+        if(id.equals("")){
+            db.collection("fires")
+                    .add(fire)
+                    .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                        @Override
+                        public void onSuccess(DocumentReference documentReference) {
+                            Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
+                            listenToData();
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.d(TAG, "Error adding document");
+                        }
+                    });
+        }
+
+        // update existing fire
+        else {
+            db.collection("fires").document(id)
+                    .set(fire)
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Log.d(TAG, "DocumentSnapshot successfully written!");
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.w(TAG, "Error writing document", e);
+                        }
+                    });
+        }
 
 
+
+
+    }
+
+    public Fire getFireByLatitude(double latitude) {
+        List<Fire> fires = localFiresLive.getValue();
+        for (int i = 0; i < fires.size(); i++) {
+            if(fires.get(i).getLatLng().latitude == latitude){
+                return fires.get(i);
+            }
+        }
+        return null;
     }
 }

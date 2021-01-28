@@ -3,8 +3,11 @@ package com.e.myfirewatch;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,14 +17,21 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.util.List;
 
 import static androidx.navigation.fragment.NavHostFragment.findNavController;
 
 public class MapsFragment extends Fragment {
 
+    private static final String TAG = "my_tag";
+    private GoogleMap googleMap;
 
     private OnMapReadyCallback callback = new OnMapReadyCallback() {
+
+
 
         /**
          * Manipulates the map once available.
@@ -34,11 +44,55 @@ public class MapsFragment extends Fragment {
          */
         @Override
         public void onMapReady(GoogleMap googleMap) {
-            LatLng sydney = new LatLng(-34, 151);
+            /*LatLng sydney = new LatLng(-34, 151);
             googleMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-            googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+            googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));*/
+
+            MapsFragment.this.googleMap = googleMap;
+
+            Log.d(TAG, "onMapready");
+
+
+            observeData();
+
+            googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                @Override
+                public boolean onMarkerClick(Marker marker) {
+                    LatLng latLng = marker.getPosition();
+                    //marker.getTag()
+                    double lat = latLng.latitude;
+
+                    Bundle bundle = new Bundle();
+                    bundle.putDouble("lat", lat);
+
+                    findNavController(MapsFragment.this).navigate(R.id.action_mapsFragment_to_edit_NewFireFragment, bundle);
+
+                    return false;
+                }
+            });
+
         }
     };
+
+
+    private void observeData() {
+        Repository.getInstance().getLocalFiresLive().observe(getViewLifecycleOwner(), new Observer<List<Fire>>() {
+            @Override
+            public void onChanged(List<Fire> fires) {
+
+                Log.d(TAG, "on data changed");
+
+                for (int i = 0; i < fires.size(); i++) {
+                    Fire fire = fires.get(i);
+                    LatLng latlng = fire.getLatLng();
+                    int severity = fire.getSeverity();
+                    googleMap.addMarker(new MarkerOptions().position(latlng).title("severity: " + severity));
+                    googleMap.moveCamera(CameraUpdateFactory.newLatLng(latlng));
+                }
+
+            }
+        });
+    }
 
 
     @Nullable
@@ -72,4 +126,12 @@ public class MapsFragment extends Fragment {
 
     }
 
+/*    @Override
+    public void onResume() {
+        super.onResume();
+
+        Log.d(TAG, "on resume");
+
+        observeData();
+    }*/
 }

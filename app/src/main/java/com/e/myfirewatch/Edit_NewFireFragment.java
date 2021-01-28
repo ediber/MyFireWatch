@@ -12,16 +12,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import java.io.IOException;
 import java.util.List;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link Edit_NewFireFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+
 public class Edit_NewFireFragment extends Fragment {
 
 
@@ -31,20 +28,13 @@ public class Edit_NewFireFragment extends Fragment {
 
     private String reporter = "reporter0";
     private EditText severityEdit;
+    private View searchButton;
+    private Switch activeSwitch;
+    private Fire fire;
 
     public Edit_NewFireFragment() {
         // Required empty public constructor
     }
-
-
-/*
-    public static Edit_NewFireFragment newInstance(String param1, String param2) {
-        Edit_NewFireFragment fragment = new Edit_NewFireFragment();
-        Bundle args = new Bundle();
-        return fragment;
-    }
-*/
-
 
 
     @Override
@@ -58,12 +48,24 @@ public class Edit_NewFireFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        double latitude = getArguments().getDouble("lat", -99);
+
         searchEdit = (EditText) view.findViewById(R.id.search_edit);
         searchText =  view.findViewById(R.id.search_text);
         severityEdit =  view.findViewById(R.id.sevirity_edit);
+        searchButton = view.findViewById(R.id.search_btn);
+        activeSwitch = view.findViewById(R.id.active_switch);
 
 
-        view.findViewById(R.id.search_btn).setOnClickListener(new View.OnClickListener() {
+        view.findViewById(R.id.cancel_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getActivity().onBackPressed();
+            }
+        });
+
+
+        searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 List<Address> addresses = getLocationFromAddress(searchEdit.getText().toString());
@@ -79,14 +81,60 @@ public class Edit_NewFireFragment extends Fragment {
             }
         });
 
-        String s = getArguments().getString("lat_lng_string");
+
+
 
         view.findViewById(R.id.save_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Repository.getInstance().save(address.getLatitude(), address.getLongitude(), severityEdit.getText().toString(), reporter);
+                // case of new fire
+                String id;
+                if(fire == null){
+                    id = "";
+                } else {
+                    id = fire.getId();
+                }
+
+                Repository.getInstance().save(address.getLatitude(), address.getLongitude(),
+                        severityEdit.getText().toString(), reporter, activeSwitch.isChecked(), id);
+
+                getActivity().onBackPressed();
             }
         });
+
+        if(latitude != -99){
+            existingLocation(latitude);
+        }
+
+
+    }
+
+    private void existingLocation(double latitude) {
+        showData(latitude);
+        updateExistingUI();
+    }
+
+    private void updateExistingUI() {
+        searchEdit.setEnabled(false);
+        searchButton.setEnabled(false);
+    }
+
+    private void showData(double latitude) {
+        fire = Repository.getInstance().getFireByLatitude(latitude);
+
+        Geocoder geocoder = new Geocoder(getContext());
+        try {
+            List<Address> addresses = geocoder.getFromLocation(latitude, fire.getLatLng().longitude, 1);
+            address = addresses.get(0);
+            String addressToShow = parseAddress(address);
+            searchText.setText(addressToShow);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        severityEdit.setText(fire.getSeverity()+"");
+        activeSwitch.setChecked(fire.isActive());
     }
 
 
