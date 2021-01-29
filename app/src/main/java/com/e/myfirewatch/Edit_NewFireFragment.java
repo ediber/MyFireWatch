@@ -26,7 +26,7 @@ public class Edit_NewFireFragment extends Fragment {
     private TextView searchText;
     private Address address;
 
-    private String reporter = "reporter0";
+    //private String reporter = "reporter0";
     private EditText severityEdit;
     private View searchButton;
     private Switch activeSwitch;
@@ -96,7 +96,7 @@ public class Edit_NewFireFragment extends Fragment {
                 }
 
                 Repository.getInstance().save(address.getLatitude(), address.getLongitude(),
-                        severityEdit.getText().toString(), reporter, activeSwitch.isChecked(), id);
+                        severityEdit.getText().toString(), activeSwitch.isChecked(), id);
 
                 getActivity().onBackPressed();
             }

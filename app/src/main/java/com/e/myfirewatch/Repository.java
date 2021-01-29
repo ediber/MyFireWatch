@@ -29,6 +29,7 @@ public class Repository {
     private FirebaseFirestore db;
 
     private MutableLiveData<List<Fire>> localFiresLive;
+    private String reporterMail;
 
     public LiveData<List<Fire>> getLocalFiresLive() {
         return localFiresLive;
@@ -96,12 +97,12 @@ public class Repository {
     }
 
 
-    public void save(double latitude, double longitude, String severity, String reporter, boolean active, String id) {
+    public void save(double latitude, double longitude, String severity, boolean active, String id) {
 
         Map<String, Object> fire = new HashMap<>();
         fire.put("lat", latitude);
         fire.put("lng", longitude);
-        fire.put("reporter", reporter);
+        fire.put("reporter", reporterMail);
         fire.put("severity", severity);
         fire.put("is_active", active);
 
@@ -155,5 +156,9 @@ public class Repository {
             }
         }
         return null;
+    }
+
+    public void setReporter(String email) {
+        this.reporterMail = email;
     }
 }
