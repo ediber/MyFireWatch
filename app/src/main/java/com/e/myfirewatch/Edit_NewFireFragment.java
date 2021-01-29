@@ -31,6 +31,7 @@ public class Edit_NewFireFragment extends Fragment {
     private View searchButton;
     private Switch activeSwitch;
     private Fire fire;
+    private TextView reporterText;
 
     public Edit_NewFireFragment() {
         // Required empty public constructor
@@ -50,12 +51,14 @@ public class Edit_NewFireFragment extends Fragment {
 
         double latitude = getArguments().getDouble("lat", -99);
 
-        searchEdit = (EditText) view.findViewById(R.id.search_edit);
+        searchEdit = view.findViewById(R.id.search_edit);
         searchText =  view.findViewById(R.id.search_text);
+        reporterText =  view.findViewById(R.id.reporter_text);
         severityEdit =  view.findViewById(R.id.sevirity_edit);
         searchButton = view.findViewById(R.id.search_btn);
         activeSwitch = view.findViewById(R.id.active_switch);
 
+        reporterText.setText(Repository.getInstance().getReporterMail());
 
         view.findViewById(R.id.cancel_button).setOnClickListener(new View.OnClickListener() {
             @Override

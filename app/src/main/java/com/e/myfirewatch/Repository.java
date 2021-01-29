@@ -29,11 +29,11 @@ public class Repository {
     private FirebaseFirestore db;
 
     private MutableLiveData<List<Fire>> localFiresLive;
+
+
+
     private String reporterMail;
 
-    public LiveData<List<Fire>> getLocalFiresLive() {
-        return localFiresLive;
-    }
 
     private Repository() {
         // Access a Cloud Firestore instance from your Activity
@@ -45,6 +45,15 @@ public class Repository {
         listenToData();
     }
 
+    public String getReporterMail() {
+        return reporterMail;
+    }
+
+    public LiveData<List<Fire>> getLocalFiresLive() {
+        return localFiresLive;
+    }
+
+
     private void listenToData() {
         db.collection("fires")
                 .get()
@@ -53,7 +62,7 @@ public class Repository {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
 
-                            List<Fire> localFires = localFiresLive.getValue();
+                            List<Fire> localFires = new ArrayList<>();
                             for (QueryDocumentSnapshot document : task.getResult()) {
                         //        Log.d(TAG, document.getId() + " => " + document.getData());
                                 Map<String, Object> data = document.getData();
@@ -133,6 +142,7 @@ public class Repository {
                         @Override
                         public void onSuccess(Void aVoid) {
                             Log.d(TAG, "DocumentSnapshot successfully written!");
+                            listenToData();
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {

@@ -15,61 +15,56 @@
             android:id="@+id/search_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="184dp"
-            android:layout_marginTop="164dp"
+            android:layout_marginTop="50dp"
             android:text="search"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/search_edit" />
+            app:layout_constraintStart_toStartOf="@+id/search_text"
+            app:layout_constraintTop_toBottomOf="@+id/search_text" />
 
         <EditText
             android:id="@+id/search_edit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="96dp"
-            android:layout_marginTop="60dp"
+            android:layout_marginTop="50dp"
             android:ems="10"
             android:hint="address"
             android:inputType="textPersonName"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintStart_toStartOf="@+id/reporter_text"
+            app:layout_constraintTop_toBottomOf="@+id/reporter_text" />
 
         <TextView
             android:id="@+id/search_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="196dp"
-            android:layout_marginTop="68dp"
-            android:text="TextView"
-            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginTop="50dp"
+            app:layout_constraintStart_toStartOf="@+id/search_edit"
             app:layout_constraintTop_toBottomOf="@+id/search_edit" />
 
         <EditText
             android:id="@+id/sevirity_edit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="124dp"
-            android:layout_marginTop="68dp"
+            android:layout_marginTop="50dp"
             android:ems="10"
             android:inputType="textPersonName"
             android:text="2"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/search_btn"
             app:layout_constraintTop_toBottomOf="@+id/search_btn" />
 
         <Button
             android:id="@+id/save_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="116dp"
-            android:layout_marginTop="96dp"
+            android:layout_marginBottom="64dp"
             android:text="save"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/sevirity_edit" />
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/active_switch"
+            app:layout_constraintTop_toBottomOf="@+id/active_switch" />
 
         <Button
             android:id="@+id/cancel_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
+            android:layout_marginStart="48dp"
             android:text="cancel"
             app:layout_constraintStart_toEndOf="@+id/save_button"
             app:layout_constraintTop_toTopOf="@+id/save_button" />
@@ -78,12 +73,21 @@
             android:id="@+id/active_switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="60dp"
-            android:layout_marginTop="32dp"
+            android:layout_marginTop="50dp"
             android:checked="true"
             android:text="active"
             app:layout_constraintStart_toStartOf="@+id/sevirity_edit"
             app:layout_constraintTop_toBottomOf="@+id/sevirity_edit" />
+
+        <TextView
+            android:id="@+id/reporter_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="100dp"
+            android:layout_marginTop="32dp"
+            android:text="reporter"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

@@ -6,6 +6,9 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,6 +19,8 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -83,12 +88,30 @@ public class MapsFragment extends Fragment {
 
                 Log.d(TAG, "on data changed");
 
+                googleMap.clear();
+
                 for (int i = 0; i < fires.size(); i++) {
                     Fire fire = fires.get(i);
-                    LatLng latlng = fire.getLatLng();
-                    int severity = fire.getSeverity();
-                    googleMap.addMarker(new MarkerOptions().position(latlng).title("severity: " + severity));
-                    googleMap.moveCamera(CameraUpdateFactory.newLatLng(latlng));
+
+                    if(fire.isActive()){
+                        LatLng latlng = fire.getLatLng();
+                        int severity = fire.getSeverity();
+                        googleMap.addMarker(new MarkerOptions().position(latlng).title("severity: " + severity).icon(null));
+                        googleMap.moveCamera(CameraUpdateFactory.newLatLng(latlng));
+                    } else {
+                        // fire is not active
+
+                        // put green icon
+                        Drawable drawable = getResources().getDrawable(R.drawable.green_icon);
+                        Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
+                        BitmapDescriptor icon = BitmapDescriptorFactory.fromBitmap(bitmap);
+
+                        LatLng latlng = fire.getLatLng();
+                        int severity = fire.getSeverity();
+                        googleMap.addMarker(new MarkerOptions().position(latlng).title("severity: " + severity).icon(icon));
+                        googleMap.moveCamera(CameraUpdateFactory.newLatLng(latlng));
+                    }
+
                 }
 
             }
@@ -113,7 +136,7 @@ public class MapsFragment extends Fragment {
             mapFragment.getMapAsync(callback);
         }
 
-        view.findViewById(R.id.add).setOnClickListener(new View.OnClickListener() {
+        view.findViewById(R.id.floating_add_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
